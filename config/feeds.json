@@ -48,7 +48,7 @@
   "Comics": ["https://syndicated.livejournal.com/xkcd_rss/data/rss"],
     "Industry": [
       "https://blog.google/rss/",
-"https://www.simoahava.com/index.xml"
+"https://www.simoahava.com/index.xml",
 "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml",
 "https://feeds.feedburner.com/OfficialGmailBlog",
 "https://analytics.blogspot.com/feeds/posts/default",
