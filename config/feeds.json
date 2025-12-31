@@ -1,23 +1,60 @@
 {
-  "Developer News": [
-    "https://hacks.mozilla.org/feed/",
-    "https://web.dev/feed.xml",
-    "https://v8.dev/blog.atom",
-    "https://alistapart.com/main/feed/",
-    "https://css-tricks.com/feed/",
-    "https://dev.to/feed",
-    "https://changelog.com/feed"
+  "Best": [
+"https://feeds.kottke.org/main",
+"https://russelldavies.typepad.com/planning/atom.xml",
+"https://jeremymaluf.com/feed/",
+"https://eryksawicki.com/feed.rss",
+"https://undermanager.ghost.io/rss/",
+"https://zine.kleinkleinklein.com/feed",
+"https://meanwhile.substack.com/feed",
+"http://blog.ishback.com/?feed=rss2",
+"http://www.thingsmagazine.net/feed/"
   ],
-  "Blogs": [
-    "https://george.mand.is/feed.xml",
-    "https://joy.recurse.com/feed.atom"
+  "Alerts": [
+"https://mygrandidea.wordpress.com/feed/",
+"https://blogs.gov.scot/digital/feed/",
+"https://bagboilbeer.wordpress.com/feed/",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/6980829982595510224",
+"https://trinitycommunitycouncil.wordpress.com/feed/",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/5001252812172638784",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/5001252812172636217",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/13739151093108705371",
+"https://www.trinityparentcouncil.org.uk/feed/",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/10557261623789012202",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/8278895429946855700",
+"https://ellis.scot/feed.xml"
   ],
-  "My GitHub Projects": [
-    "https://github.com/georgemandis.atom",
-    "https://github.com/georgemandis/bubo-rss/releases.atom",
-    "https://github.com/georgemandis/konami-js/releases.atom",
-    "https://github.com/georgemandis/konami-js/commits/main.atom",
-    "https://github.com/javascriptforartists/cheer-me-up-and-sing-me-a-song/commits/master.atom",
-    "https://github.com/georgemandis/circuit-playground-midi-multi-tool/commits/master.atom"
-  ]
+  "Cool": [
+"https://peregrinecoast.press/blogs/news.atom",
+"https://www.outsidersstore.com/blogs/blog.atom",
+"https://makezine.com/feed/",
+"https://hackaday.com/feed/",
+"https://findings.lol/feed.xml",
+"https://pluralistic.net/feed/",
+"https://www.reverselandfill.org/feed/",
+"https://sippey.com/rss.xml",
+"https://extension765.com/blogs/soderblog.atom",
+"https://www.swiss-miss.com/feed",
+"https://www.wallpaper.com/feeds/tag/interior-accessories",
+"https://www.antipope.org/charlie/blog-static/atom.xml",
+"https://emilywebber.co.uk/feed/",
+"https://laughingsquid.com/feed/",
+"https://threadinburgh.scot/feed/",
+"https://afterschool.substack.com/feed",
+"https://feeds.acast.com/public/shows/41233",
+"https://craphound.com/?feed=rss2",
+"https://www.wowhaus.co.uk/feed/"  
+      ],
+  "Comics": ["https://syndicated.livejournal.com/xkcd_rss/data/rss"],
+    "Industry": [
+      "https://blog.google/rss/",
+"https://www.simoahava.com/index.xml"
+"https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml",
+"https://feeds.feedburner.com/OfficialGmailBlog",
+"https://analytics.blogspot.com/feeds/posts/default",
+"https://webmasters.googleblog.com/feeds/posts/default",
+"https://officialandroid.blogspot.com/feeds/posts/default",
+"https://gdsdata.blog.gov.uk/feed/",
+"https://gds.blog.gov.uk/feed/"
+    ]
 }
