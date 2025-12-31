@@ -10,60 +10,29 @@
   <body>
     <h1>🦉 Bubo Reader</h1>
 
-    <section id="posts">
-      <table class="posts-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Category</th>
-            <th>Blog</th>
-            <th>Post</th>
-            <th>Archive</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for post in posts %}
-          <tr>
-            <td>
-              {% if post.timestamp %}
-                {{ post.timestamp | formatDate }}
-              {% else %}
-                {{ post.date }}
-              {% endif %}
-            </td>
-            <td>{{ post.category }}</td>
-            <td>{{ post.blogName }}</td>
-            <td>
-              {% if post.url %}
-                <a
-                  href="{{ post.url }}"
-                  target="_blank"
-                  rel="noopener norefferer nofollow"
-                >
-                  {{ post.title }}
-                </a>
-              {% else %}
-                {{ post.title }}
-              {% endif %}
-            </td>
-            <td>
-              {% if post.url %}
-                <a
-                  href="https://archive.md/{{ post.url }}"
-                  target="_blank"
-                  rel="noopener norefferer nofollow"
-                >
-                  archive.md
-                </a>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-
-    {% if errors | length > 0 %}
+    {% for group, feeds in data %}
+    <h2>{{ group }}</h2>
+    {% for feed in feeds %}
+    <details>
+      <summary>
+        <span class="feed-title">{{ feed.title }}</span>
+        <span class="feed-url">({{ feed.feed }})</span>
+      </summary>
+      <ul>
+        {% for item in feed.items %}
+        <li>
+          {{ item.timestamp | formatDate }} -
+          <a
+            href="{{ item.link }}"
+            target="_blank"
+            rel="noopener norefferer nofollow"
+            >{{ item.title }}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endfor %} {% endfor %} {% if errors | length > 0 %}
     <h2>Errors</h2>
     <p>There were errors trying to parse these feeds:</p>
     <ul>
