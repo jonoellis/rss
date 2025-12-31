@@ -10,10 +10,9 @@
  * Licensed under the MIT License (http://opensource.org/licenses/MIT)
  */
 
-import fetch from "node-fetch";
+import fetch, { Response } from "node-fetch";
 import Parser from "rss-parser";
 import { Feeds, FeedItem } from "./@types/bubo";
-import { Response } from "node-fetch";
 import { render } from "./renderer.js";
 import {
   getLink,
@@ -33,8 +32,9 @@ const feedListLength =
   Object.entries(feedList).flat(2).length - Object.keys(feedList).length;
 
 /**
- * contentFromAllFeeds = Contains normalized, aggregated feed data grouped by “group”
- * errors = Contains errors from parsing feeds.
+ * contentFromAllFeeds = Contains normalized, aggregated feed data and is passed
+ * to the template renderer at the end (still needed for type compatibility).
+ * errors = Contains errors from parsing feeds and is also passed to template.
  */
 const contentFromAllFeeds: Feeds = {};
 const errors: unknown[] = [];
@@ -59,6 +59,35 @@ const success = chalk.bold.green;
 // to feedListLength and know when we're finished.
 let completed = 0;
 
+// Shape for the flattened posts passed to the template
+type FlatPost = {
+  date: string;
+  timestamp: number;
+  category: string;
+  blogName: string;
+  title: string;
+  url: string;
+};
+
+/**
+ * normalizeDateToString
+ * --
+ * Safely turns various date-ish fields into a string.
+ */
+const normalizeDateToString = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number") {
+    // treat as ms since epoch
+    return new Date(value).toISOString();
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  return "";
+};
+
 /**
  * finishBuild
  * --
@@ -66,10 +95,10 @@ let completed = 0;
  * and we want to build the static output.
  *
  * This version:
- *  - Flattens all items across all groups into a single list
+ *  - Flattens all items across all groups into a single list (`flatPosts`)
  *  - Attaches group (as category) and feed title (blog name)
  *  - Sorts by timestamp descending
- *  - Passes `posts` into the template instead of grouped data
+ *  - Calls render with { data, posts, errors, info } so types stay happy
  */
 const finishBuild: () => void = async () => {
   completed++;
@@ -78,37 +107,43 @@ const finishBuild: () => void = async () => {
 
   process.stdout.write("\nDone fetching everything!\n");
 
-  // Build a flat, time-sorted list of posts
-  type FlatPost = {
-    date: string;
-    timestamp: number;
-    category: string;
-    blogName: string;
-    title: string;
-    url: string;
-  };
-
   const flatPosts: FlatPost[] = [];
 
   for (const [group, feeds] of Object.entries(contentFromAllFeeds)) {
     for (const feed of feeds as FeedItem[]) {
-      const blogName = feed.title || feed.feed || "";
+      const blogName = (feed.title as string) || (feed.feed as string) || "";
 
       feed.items?.forEach(item => {
-        const ts = item.timestamp || getTimestamp(item);
+        // timestamp is always a number
+        const ts = (() => {
+          const t = item.timestamp ?? getTimestamp(item);
+          if (typeof t === "number") return t;
+          if (typeof t === "string") {
+            const parsed = Date.parse(t);
+            return Number.isNaN(parsed) ? 0 : parsed;
+          }
+          if (t instanceof Date) return t.getTime();
+          return 0;
+        })();
+
         const dateString =
-          (typeof item.isoDate === "string" && item.isoDate) ||
-          (typeof item.pubDate === "string" && item.pubDate) ||
-          (typeof item.date === "string" && item.date) ||
-          "";
+          normalizeDateToString(item.isoDate) ||
+          normalizeDateToString(item.pubDate) ||
+          normalizeDateToString(item.date);
+
+        const title =
+          typeof item.title === "string" ? item.title : getTitle(item);
+
+        const url =
+          typeof item.link === "string" ? item.link : getLink(item);
 
         flatPosts.push({
           date: dateString,
-          timestamp: ts || 0,
+          timestamp: ts,
           category: group,
           blogName,
-          title: item.title || "",
-          url: item.link || ""
+          title,
+          url
         });
       });
     }
@@ -119,6 +154,9 @@ const finishBuild: () => void = async () => {
 
   // generate the static HTML output from our template renderer
   const output = render({
+    // keep original grouped data to satisfy existing types
+    data: contentFromAllFeeds,
+    // new flat list the template actually uses
     posts: flatPosts,
     errors: errors,
     info: buboInfo
@@ -152,7 +190,7 @@ const processFeed =
   }) =>
   async (response: Response): Promise<void> => {
     const body = await parseFeed(response);
-    // skip to the next one if this didn't work out
+    //skip to the next one if this didn't work out
     if (!body) return;
 
     try {
