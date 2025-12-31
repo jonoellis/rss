@@ -33,8 +33,8 @@ const feedListLength =
   Object.entries(feedList).flat(2).length - Object.keys(feedList).length;
 
 /**
- * contentFromAllFeeds = Contains normalized, aggregated feed data and is passed to template renderer at the end
- * errors = Contains errors from parsing feeds and is also passed to template.
+ * contentFromAllFeeds = Contains normalized, aggregated feed data grouped by “group”
+ * errors = Contains errors from parsing feeds.
  */
 const contentFromAllFeeds: Feeds = {};
 const errors: unknown[] = [];
@@ -46,7 +46,7 @@ const benchmark = (startTime: number) =>
 
 /**
  * These values are used to control throttling/batching the fetches:
- *  - MAX_CONNECTION = max number of fetches to contain in a batch
+ *  - MAX_CONNECTIONS = max number of fetches to contain in a batch
  *  - DELAY_MS = the delay in milliseconds between batches
  */
 const MAX_CONNECTIONS = Infinity;
@@ -64,6 +64,12 @@ let completed = 0;
  * --
  * function that gets called when all the feeds are through fetching
  * and we want to build the static output.
+ *
+ * This version:
+ *  - Flattens all items across all groups into a single list
+ *  - Attaches group (as category) and feed title (blog name)
+ *  - Sorts by timestamp descending
+ *  - Passes `posts` into the template instead of grouped data
  */
 const finishBuild: () => void = async () => {
   completed++;
@@ -72,9 +78,48 @@ const finishBuild: () => void = async () => {
 
   process.stdout.write("\nDone fetching everything!\n");
 
+  // Build a flat, time-sorted list of posts
+  type FlatPost = {
+    date: string;
+    timestamp: number;
+    category: string;
+    blogName: string;
+    title: string;
+    url: string;
+  };
+
+  const flatPosts: FlatPost[] = [];
+
+  for (const [group, feeds] of Object.entries(contentFromAllFeeds)) {
+    for (const feed of feeds as FeedItem[]) {
+      const blogName = feed.title || feed.feed || "";
+
+      feed.items?.forEach(item => {
+        const ts = item.timestamp || getTimestamp(item);
+        const dateString =
+          (typeof item.isoDate === "string" && item.isoDate) ||
+          (typeof item.pubDate === "string" && item.pubDate) ||
+          (typeof item.date === "string" && item.date) ||
+          "";
+
+        flatPosts.push({
+          date: dateString,
+          timestamp: ts || 0,
+          category: group,
+          blogName,
+          title: item.title || "",
+          url: item.link || ""
+        });
+      });
+    }
+  }
+
+  // Sort newest first
+  flatPosts.sort((a, b) => b.timestamp - a.timestamp);
+
   // generate the static HTML output from our template renderer
   const output = render({
-    data: contentFromAllFeeds,
+    posts: flatPosts,
     errors: errors,
     info: buboInfo
   });
@@ -105,42 +150,42 @@ const processFeed =
     feed: string;
     startTime: number;
   }) =>
-    async (response: Response): Promise<void> => {
-      const body = await parseFeed(response);
-      //skip to the next one if this didn't work out
-      if (!body) return;
+  async (response: Response): Promise<void> => {
+    const body = await parseFeed(response);
+    // skip to the next one if this didn't work out
+    if (!body) return;
 
-      try {
-        const contents: FeedItem = (
-          typeof body === "string" ? await parser.parseString(body) : body
-        ) as FeedItem;
+    try {
+      const contents: FeedItem = (
+        typeof body === "string" ? await parser.parseString(body) : body
+      ) as FeedItem;
 
-        contents.feed = feed;
-        contents.title = getTitle(contents);
-        contents.link = getLink(contents);
+      contents.feed = feed;
+      contents.title = getTitle(contents);
+      contents.link = getLink(contents);
 
-        // try to normalize date attribute naming
-        contents?.items?.forEach(item => {
-          item.timestamp = getTimestamp(item);
-          item.title = getTitle(item);
-          item.link = getLink(item);
-        });
+      // try to normalize date attribute naming
+      contents?.items?.forEach(item => {
+        item.timestamp = getTimestamp(item);
+        item.title = getTitle(item);
+        item.link = getLink(item);
+      });
 
-        contentFromAllFeeds[group].push(contents as object);
-        process.stdout.write(
-          `${success("Successfully fetched:")} ${feed} - ${benchmark(startTime)}\n`
-        );
-      } catch (err) {
-        process.stdout.write(
-          `${error("Error processing:")} ${feed} - ${benchmark(
-            startTime
-          )}\n${err}\n`
-        );
-        errors.push(`Error processing: ${feed}\n\t${err}`);
-      }
+      contentFromAllFeeds[group].push(contents as object);
+      process.stdout.write(
+        `${success("Successfully fetched:")} ${feed} - ${benchmark(startTime)}\n`
+      );
+    } catch (err) {
+      process.stdout.write(
+        `${error("Error processing:")} ${feed} - ${benchmark(
+          startTime
+        )}\n${err}\n`
+      );
+      errors.push(`Error processing: ${feed}\n\t${err}`);
+    }
 
-      finishBuild();
-    };
+    finishBuild();
+  };
 
 // go through each group of feeds and process
 const processFeeds = () => {
