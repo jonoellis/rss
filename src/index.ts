@@ -10,9 +10,10 @@
  * Licensed under the MIT License (http://opensource.org/licenses/MIT)
  */
 
-import fetch, { Response } from "node-fetch";
+import fetch from "node-fetch";
 import Parser from "rss-parser";
 import { Feeds, FeedItem } from "./@types/bubo";
+import { Response } from "node-fetch";
 import { render } from "./renderer.js";
 import {
   getLink,
@@ -32,8 +33,7 @@ const feedListLength =
   Object.entries(feedList).flat(2).length - Object.keys(feedList).length;
 
 /**
- * contentFromAllFeeds = Contains normalized, aggregated feed data and is passed
- * to the template renderer at the end (still needed for type compatibility).
+ * contentFromAllFeeds = Contains normalized, aggregated feed data and is passed to template renderer at the end
  * errors = Contains errors from parsing feeds and is also passed to template.
  */
 const contentFromAllFeeds: Feeds = {};
@@ -46,7 +46,7 @@ const benchmark = (startTime: number) =>
 
 /**
  * These values are used to control throttling/batching the fetches:
- *  - MAX_CONNECTIONS = max number of fetches to contain in a batch
+ *  - MAX_CONNECTION = max number of fetches to contain in a batch
  *  - DELAY_MS = the delay in milliseconds between batches
  */
 const MAX_CONNECTIONS = Infinity;
@@ -59,46 +59,11 @@ const success = chalk.bold.green;
 // to feedListLength and know when we're finished.
 let completed = 0;
 
-// Shape for the flattened posts passed to the template
-type FlatPost = {
-  date: string;
-  timestamp: number;
-  category: string;
-  blogName: string;
-  title: string;
-  url: string;
-};
-
-/**
- * normalizeDateToString
- * --
- * Safely turns various date-ish fields into a string.
- */
-const normalizeDateToString = (value: unknown): string => {
-  if (typeof value === "string") {
-    return value;
-  }
-  if (typeof value === "number") {
-    // treat as ms since epoch
-    return new Date(value).toISOString();
-  }
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  return "";
-};
-
 /**
  * finishBuild
  * --
  * function that gets called when all the feeds are through fetching
  * and we want to build the static output.
- *
- * This version:
- *  - Flattens all items across all groups into a single list (`flatPosts`)
- *  - Attaches group (as category) and feed title (blog name)
- *  - Sorts by timestamp descending
- *  - Calls render with { data, posts, errors, info } so types stay happy
  */
 const finishBuild: () => void = async () => {
   completed++;
@@ -107,57 +72,9 @@ const finishBuild: () => void = async () => {
 
   process.stdout.write("\nDone fetching everything!\n");
 
-  const flatPosts: FlatPost[] = [];
-
-  for (const [group, feeds] of Object.entries(contentFromAllFeeds)) {
-    for (const feed of feeds as FeedItem[]) {
-      const blogName = (feed.title as string) || (feed.feed as string) || "";
-
-      feed.items?.forEach(item => {
-        // timestamp is always a number
-        const ts = (() => {
-          const t = item.timestamp ?? getTimestamp(item);
-          if (typeof t === "number") return t;
-          if (typeof t === "string") {
-            const parsed = Date.parse(t);
-            return Number.isNaN(parsed) ? 0 : parsed;
-          }
-          if (t instanceof Date) return t.getTime();
-          return 0;
-        })();
-
-        const dateString =
-          normalizeDateToString(item.isoDate) ||
-          normalizeDateToString(item.pubDate) ||
-          normalizeDateToString(item.date);
-
-        const title =
-          typeof item.title === "string" ? item.title : getTitle(item);
-
-        const url =
-          typeof item.link === "string" ? item.link : getLink(item);
-
-        flatPosts.push({
-          date: dateString,
-          timestamp: ts,
-          category: group,
-          blogName,
-          title,
-          url
-        });
-      });
-    }
-  }
-
-  // Sort newest first
-  flatPosts.sort((a, b) => b.timestamp - a.timestamp);
-
   // generate the static HTML output from our template renderer
   const output = render({
-    // keep original grouped data to satisfy existing types
     data: contentFromAllFeeds,
-    // new flat list the template actually uses
-    posts: flatPosts,
     errors: errors,
     info: buboInfo
   });
@@ -188,42 +105,42 @@ const processFeed =
     feed: string;
     startTime: number;
   }) =>
-  async (response: Response): Promise<void> => {
-    const body = await parseFeed(response);
-    //skip to the next one if this didn't work out
-    if (!body) return;
+    async (response: Response): Promise<void> => {
+      const body = await parseFeed(response);
+      //skip to the next one if this didn't work out
+      if (!body) return;
 
-    try {
-      const contents: FeedItem = (
-        typeof body === "string" ? await parser.parseString(body) : body
-      ) as FeedItem;
+      try {
+        const contents: FeedItem = (
+          typeof body === "string" ? await parser.parseString(body) : body
+        ) as FeedItem;
 
-      contents.feed = feed;
-      contents.title = getTitle(contents);
-      contents.link = getLink(contents);
+        contents.feed = feed;
+        contents.title = getTitle(contents);
+        contents.link = getLink(contents);
 
-      // try to normalize date attribute naming
-      contents?.items?.forEach(item => {
-        item.timestamp = getTimestamp(item);
-        item.title = getTitle(item);
-        item.link = getLink(item);
-      });
+        // try to normalize date attribute naming
+        contents?.items?.forEach(item => {
+          item.timestamp = getTimestamp(item);
+          item.title = getTitle(item);
+          item.link = getLink(item);
+        });
 
-      contentFromAllFeeds[group].push(contents as object);
-      process.stdout.write(
-        `${success("Successfully fetched:")} ${feed} - ${benchmark(startTime)}\n`
-      );
-    } catch (err) {
-      process.stdout.write(
-        `${error("Error processing:")} ${feed} - ${benchmark(
-          startTime
-        )}\n${err}\n`
-      );
-      errors.push(`Error processing: ${feed}\n\t${err}`);
-    }
+        contentFromAllFeeds[group].push(contents as object);
+        process.stdout.write(
+          `${success("Successfully fetched:")} ${feed} - ${benchmark(startTime)}\n`
+        );
+      } catch (err) {
+        process.stdout.write(
+          `${error("Error processing:")} ${feed} - ${benchmark(
+            startTime
+          )}\n${err}\n`
+        );
+        errors.push(`Error processing: ${feed}\n\t${err}`);
+      }
 
-    finishBuild();
-  };
+      finishBuild();
+    };
 
 // go through each group of feeds and process
 const processFeeds = () => {
