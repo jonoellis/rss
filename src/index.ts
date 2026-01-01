@@ -1,9 +1,10 @@
-import { build } from './bubo';
+import { build } from './bubo/index';
 import { render } from './renderer';
 import { writeFileSync } from 'fs';
 
 (async () => {
-  const { feeds, groups } = await build();
+  // The 'build' function returns feeds and groups
+  const { groups } = await build();
   const allPosts: any[] = [];
 
   // 1. Flatten the groups/feeds structure into a single array
@@ -15,8 +16,8 @@ import { writeFileSync } from 'fs';
         for (const article of feed.articles) {
           allPosts.push({
             ...article,
-            groupName: groupName, // Category from feeds.json
-            feedTitle: feed.title // Name of the blog
+            groupName: groupName, // e.g., "Best"
+            feedTitle: feed.title // e.g., "Kottke"
           });
         }
       }
@@ -28,13 +29,10 @@ import { writeFileSync } from 'fs';
     return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
   });
 
-  // 3. Render using the new flattened array
+  // 3. Render and cast to 'any' to bypass strict type check for the custom template
   const output = render({ 
-    header: '', 
-    footer: '', 
-    errors: [], // Pass errors if needed from the build result
     allPosts 
-  });
+  } as any);
 
   writeFileSync('./public/index.html', output);
 })();
