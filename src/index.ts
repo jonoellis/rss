@@ -5,56 +5,53 @@ import { writeFileSync, readFileSync } from 'fs';
 const parser = new Parser();
 
 (async () => {
-  console.log("Starting final build...");
+  console.log("Starting build with error tracking...");
   try {
-    // 1. Setup Nunjucks
     const env = nunjucks.configure({ autoescape: true });
-    env.addFilter("formatDate", (dateString) => {
-      const date = new Date(dateString);
-      return !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : dateString;
-    });
-
-    // 2. Load feeds and template
     const feedsData = JSON.parse(readFileSync('./config/feeds.json', 'utf-8'));
     const template = readFileSync('./config/template.html', 'utf-8');
     
     const allPosts: any[] = [];
+    const errorFeeds: string[] = [];
 
-    // 3. Fetch feeds
     for (const groupName in feedsData) {
-      console.log(`Fetching group: ${groupName}`);
       for (const url of feedsData[groupName]) {
         try {
-          const feed = await parser.parseURL(url);
+          // 5-second timeout to keep the build moving
+          const feed = await Promise.race([
+            parser.parseURL(url),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+          ]) as any;
+
           feed.items?.forEach(item => {
             allPosts.push({
               title: item.title,
               link: item.link,
               pubDate: item.pubDate || item.isoDate,
-              feedTitle: feed.title,
-              groupName: groupName
+              feedTitle: feed.title
             });
           });
         } catch (e) {
-          console.warn(`Skipping ${url}`);
+          console.warn(`Error with: ${url}`);
+          errorFeeds.push(url);
         }
       }
     }
 
-    // 4. Sort everything Newest to Oldest
+    // Sort Newest to Oldest
     allPosts.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
-    // 5. Render
     const output = env.renderString(template, { 
-      data: { allPosts }, // Wrapped for the template
+      allPosts, 
+      errorFeeds,
       now: new Date().toUTCString()
     });
 
     writeFileSync('./public/index.html', output);
-    console.log("SUCCESS: index.html generated.");
+    console.log("SUCCESS: index.html generated with error reports.");
 
   } catch (error) {
-    console.error("Final Build Error:", error);
+    console.error("Build Error:", error);
     process.exit(1);
   }
 })();
