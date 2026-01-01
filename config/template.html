@@ -3,34 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSS Reader</title>
+    <title>RSS Feed</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 1rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        body { font-family: sans-serif; line-height: 1.5; color: #333; max-width: 1000px; margin: 0 auto; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
         tr { border-bottom: 1px solid #eee; }
-        tr:hover { background: #fdfdfd; }
-        td { padding: 8px 4px; vertical-align: top; }
-        .date { color: #888; white-space: nowrap; width: 95px; }
-        .category { color: #999; font-size: 0.7rem; text-transform: uppercase; width: 80px; font-weight: bold; }
-        .blog-name { color: #444; font-weight: 600; width: 160px; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .archive { font-size: 0.75rem; opacity: 0.6; text-align: right; width: 60px; }
+        td { padding: 8px 4px; vertical-align: top; font-size: 0.9rem; }
+        .date { color: #888; width: 100px; }
+        .cat { color: #999; font-size: 0.7rem; text-transform: uppercase; font-weight: bold; width: 80px; }
+        .blog { font-weight: bold; width: 150px; }
+        a { color: blue; text-decoration: none; }
     </style>
 </head>
 <body>
     <table>
         <tbody>
-            <% for(const post of allPosts) { %>
-            <tr>
-                <td class="date">
-                    <%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '????-??-??' %>
-                </td>
-                <td class="category">[<%= post.groupName %>]</td>
-                <td class="blog-name"><%= post.feedTitle %></td>
-                <td><a href="<%= post.link %>" target="_blank"><%= post.title %></a></td>
-                <td class="archive"><a href="https://archive.md/<%= post.link %>" target="_blank">archive</a></td>
-            </tr>
+            <% if (locals.allPosts) { %>
+                <% for(const post of allPosts) { %>
+                <tr>
+                    <td class="date"><%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '' %></td>
+                    <td class="cat">[<%= post.groupName %>]</td>
+                    <td class="blog"><%= post.feedTitle %></td>
+                    <td><a href="<%= post.link %>" target="_blank"><%= post.title %></a></td>
+                    <td><a href="https://archive.md/<%= post.link %>" target="_blank" style="color:#999; font-size:0.7rem;">archive</a></td>
+                </tr>
+                <% } %>
+            <% } else { %>
+                <tr><td>No posts found. Check build logs.</td></tr>
             <% } %>
         </tbody>
     </table>
