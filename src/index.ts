@@ -1,5 +1,5 @@
-import { build } from './bubo/index.js';
-import { render } from './renderer.js';
+import { build } from './bubo/index';
+import { render } from './renderer';
 import { writeFileSync } from 'fs';
 
 (async () => {
@@ -8,15 +8,15 @@ import { writeFileSync } from 'fs';
     const { groups } = await build();
     const allPosts: any[] = [];
 
-    // Flatten and tag posts with Category and Blog Name
+    // Flattening categories into a single timeline
     for (const groupName in groups) {
-      const feeds = groups[groupName];
-      for (const feed of feeds) {
+      const feedsInGroup = groups[groupName];
+      for (const feed of feedsInGroup) {
         if (feed.articles) {
           for (const article of feed.articles) {
             allPosts.push({
               ...article,
-              groupName: groupName,
+              groupName: groupName, 
               feedTitle: feed.title
             });
           }
@@ -24,21 +24,23 @@ import { writeFileSync } from 'fs';
       }
     }
 
-    // Sort: Most recent at the top
+    // Sort by Date (Newest first)
     allPosts.sort((a, b) => {
-      const d1 = new Date(a.pubDate || 0).getTime();
-      const d2 = new Date(b.pubDate || 0).getTime();
-      return d2 - d1;
+      const dateA = new Date(a.pubDate || 0).getTime();
+      const dateB = new Date(b.pubDate || 0).getTime();
+      return dateB - dateA;
     });
 
-    // Render using the custom template variable 'allPosts'
-    // We cast to any to stop TypeScript from complaining about the custom variable
-    const output = render({ allPosts } as any);
-
+    // Render using 'as any' to allow our new flattened list
+    const output = render({ 
+      allPosts 
+    } as any);
+    
     writeFileSync('./public/index.html', output);
-    console.log(`Build success: ${allPosts.length} posts generated.`);
-  } catch (err) {
-    console.error("Critical Build Error:", err);
+    console.log(`Success! ${allPosts.length} posts written.`);
+
+  } catch (error) {
+    console.error("Build Error:", error);
     process.exit(1);
   }
 })();
