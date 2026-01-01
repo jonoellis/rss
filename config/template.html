@@ -1,56 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>🦉 Bubo Reader</title>
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
-    <h1>🦉 Bubo Reader</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Reader</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        tr { border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        td { padding: 8px 4px; vertical-align: top; }
+        .date { color: #666; white-space: nowrap; width: 100px; }
+        .category { color: #888; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; width: 80px; }
+        .blog-name { color: #444; font-weight: 600; width: 180px; overflow: hidden; text-overflow: ellipsis; }
+        .title { font-weight: 400; }
+        .archive { font-size: 0.8rem; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .footer { margin-top: 2rem; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 1rem; }
+    </style>
+</head>
+<body>
 
-    {% for group, feeds in data %}
-    <h2>{{ group }}</h2>
-    {% for feed in feeds %}
-    <details>
-      <summary>
-        <span class="feed-title">{{ feed.title }}</span>
-        <span class="feed-url">({{ feed.feed }})</span>
-      </summary>
-      <ul>
-        {% for item in feed.items %}
-        <li>
-          {{ item.timestamp | formatDate }} -
-          <a
-            href="{{ item.link }}"
-            target="_blank"
-            rel="noopener norefferer nofollow"
-            >{{ item.title }}</a
-          >
-        </li>
-        {% endfor %}
-      </ul>
-    </details>
-    {% endfor %} {% endfor %} {% if errors | length > 0 %}
-    <h2>Errors</h2>
-    <p>There were errors trying to parse these feeds:</p>
-    <ul>
-      {% for error in errors %}
-      <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
+    <table>
+        <tbody>
+            <% for(const post of allPosts) { %>
+            <tr>
+                <td class="date">
+                    <%= new Date(post.pubDate).toISOString().split('T')[0] %>
+                </td>
+                <td class="category">
+                    [<%= post.groupName %>]
+                </td>
+                <td class="blog-name">
+                    <%= post.feedTitle %>
+                </td>
+                <td class="title">
+                    <a href="<%= post.link %>" target="_blank" rel="noopener"><%= post.title %></a>
+                </td>
+                <td class="archive">
+                    <a href="https://archive.md/<%= post.link %>" target="_blank" title="View Archive">archive.md</a>
+                </td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
 
-    <br />
-    <hr />
-    <p>Last updated {{ now }}.</p>
-    <p>
-      Powered by
-      <a href="https://github.com/georgemandis/bubo-rss"
-        >Bubo Reader (v{{ info.version }})</a
-      >, a project by <a href="https://george.mand.is">George Mandis</a>. ❤️
-      <a href="{{ info.funding.url }}">Sponsor on GitHub</a>
-    </p>
-  </body>
+    <div class="footer">
+        <p>Updated: <%= new Date().toISOString() %></p>
+    </div>
+
+</body>
 </html>
