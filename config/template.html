@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSS Reader</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         tr { border-bottom: 1px solid #eee; }
-        tr:hover { background: #f9f9f9; }
-        td { padding: 8px 4px; vertical-align: top; }
-        .date { color: #666; white-space: nowrap; width: 100px; }
-        .category { color: #888; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; width: 80px; }
-        .blog-name { color: #444; font-weight: 600; width: 180px; overflow: hidden; text-overflow: ellipsis; }
+        tr:hover { background: #fdfdfd; }
+        td { padding: 6px 4px; vertical-align: top; }
+        .date { color: #888; white-space: nowrap; width: 90px; }
+        .category { color: #999; font-size: 0.7rem; text-transform: uppercase; width: 80px; }
+        .blog-name { color: #555; font-weight: 600; width: 150px; }
         .title { font-weight: 400; }
-        .archive { font-size: 0.8rem; }
         a { color: #0066cc; text-decoration: none; }
         a:hover { text-decoration: underline; }
-        .footer { margin-top: 2rem; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 1rem; }
+        .archive { font-size: 0.75rem; opacity: 0.6; }
+        .footer { margin-top: 2rem; font-size: 0.7rem; color: #bbb; text-align: center; }
     </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
             <% for(const post of allPosts) { %>
             <tr>
                 <td class="date">
-                    <%= new Date(post.pubDate).toISOString().split('T')[0] %>
+                    <%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : 'n/a' %>
                 </td>
                 <td class="category">
                     [<%= post.groupName %>]
@@ -39,7 +39,7 @@
                     <a href="<%= post.link %>" target="_blank" rel="noopener"><%= post.title %></a>
                 </td>
                 <td class="archive">
-                    <a href="https://archive.md/<%= post.link %>" target="_blank" title="View Archive">archive.md</a>
+                    <a href="https://archive.md/<%= post.link %>" target="_blank">archive</a>
                 </td>
             </tr>
             <% } %>
@@ -47,7 +47,7 @@
     </table>
 
     <div class="footer">
-        <p>Updated: <%= new Date().toISOString() %></p>
+        Updated: <%= new Date().toISOString() %>
     </div>
 
 </body>
