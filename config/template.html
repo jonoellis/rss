@@ -3,31 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSS Feed</title>
+    <title>Reading List</title>
     <style>
-        body { font-family: -apple-system, sans-serif; max-width: 1100px; margin: 0 auto; padding: 20px; }
+        body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px 20px; background: #fff; color: #333; }
         table { width: 100%; border-collapse: collapse; }
-        td { padding: 10px 5px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .date { color: #888; width: 110px; }
-        .cat { color: #999; font-size: 11px; text-transform: uppercase; font-weight: bold; width: 90px; }
-        .blog { font-weight: 600; width: 180px; }
-        a { color: #0066cc; text-decoration: none; }
+        td { padding: 10px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+        .blog-name { width: 200px; font-weight: 600; color: #666; font-size: 0.85rem; padding-right: 20px; }
+        .post-title { color: #0066cc; text-decoration: none; font-size: 0.95rem; }
+        .post-title:hover { text-decoration: underline; }
+        
+        .footer { margin-top: 80px; padding-top: 20px; border-top: 1px dashed #eee; font-size: 0.7rem; color: #bbb; }
+        .error-log { margin-top: 20px; color: #e06c75; background: #fff5f5; padding: 10px; border-radius: 4px; }
+        .error-log h3 { font-size: 0.75rem; margin-top: 0; text-transform: uppercase; }
+        .error-log ul { list-style: none; padding: 0; margin: 0; }
     </style>
 </head>
 <body>
     <table>
         <tbody>
-            {% for post in data.allPosts %}
+            {% for post in allPosts %}
             <tr>
-                <td class="date">{{ post.pubDate | formatDate }}</td>
-                <td class="cat">[{{ post.groupName }}]</td>
-                <td class="blog">{{ post.feedTitle }}</td>
-                <td><a href="{{ post.link }}" target="_blank">{{ post.title }}</a></td>
-                <td><a href="https://archive.md/{{ post.link }}" target="_blank" style="color:#ccc; font-size:11px;">archive</a></td>
+                <td class="blog-name">{{ post.feedTitle }}</td>
+                <td><a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <p style="text-align:center; color:#ccc; font-size:12px;">Updated: {{ now }}</p>
+
+    <div class="footer">
+        <p>Last update: {{ now }}</p>
+        
+        {% if errorFeeds.length > 0 %}
+        <div class="error-log">
+            <h3>Feed Errors ({{ errorFeeds.length }})</h3>
+            <ul>
+                {% for url in errorFeeds %}
+                <li>Broken: {{ url }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
