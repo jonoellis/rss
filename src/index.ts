@@ -14,23 +14,29 @@ const parser = new Parser();
     const allPosts: any[] = [];
     const errorFeeds: string[] = [];
 
+    // Explicitly typing 'groupName' as string
     for (const groupName in feedsData) {
-      for (const url of feedsData[groupName]) {
+      const urls = feedsData[groupName] as string[];
+      
+      for (const url of urls) {
         try {
-          // 5-second timeout to keep the build moving
+          // 5-second timeout for each feed
           const feed = await Promise.race([
             parser.parseURL(url),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
           ]) as any;
 
-          feed.items?.forEach(item => {
-            allPosts.push({
-              title: item.title,
-              link: item.link,
-              pubDate: item.pubDate || item.isoDate,
-              feedTitle: feed.title
+          if (feed && feed.items) {
+            feed.items.forEach((item: any) => {
+              allPosts.push({
+                title: item.title,
+                link: item.link,
+                pubDate: item.pubDate || item.isoDate,
+                feedTitle: feed.title,
+                groupName: groupName
+              });
             });
-          });
+          }
         } catch (e) {
           console.warn(`Error with: ${url}`);
           errorFeeds.push(url);
@@ -48,7 +54,7 @@ const parser = new Parser();
     });
 
     writeFileSync('./public/index.html', output);
-    console.log("SUCCESS: index.html generated with error reports.");
+    console.log("SUCCESS: index.html generated.");
 
   } catch (error) {
     console.error("Build Error:", error);
