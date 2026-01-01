@@ -1,23 +1,22 @@
-import { build } from '@bubo';
-import { render } from './renderer';
+import { build } from './bubo/index.js';
+import { render } from './renderer.js';
 import { writeFileSync } from 'fs';
 
-async function run() {
-  console.log("Starting build process...");
-  
+(async () => {
+  console.log("Build started...");
   try {
     const { groups } = await build();
     const allPosts: any[] = [];
 
-    // Flattening categories into a single timeline
+    // Flatten and tag posts with Category and Blog Name
     for (const groupName in groups) {
-      const feedsInGroup = groups[groupName];
-      for (const feed of feedsInGroup) {
+      const feeds = groups[groupName];
+      for (const feed of feeds) {
         if (feed.articles) {
           for (const article of feed.articles) {
             allPosts.push({
               ...article,
-              groupName: groupName, 
+              groupName: groupName,
               feedTitle: feed.title
             });
           }
@@ -25,26 +24,21 @@ async function run() {
       }
     }
 
-    // Sort by Date (Newest first)
+    // Sort: Most recent at the top
     allPosts.sort((a, b) => {
-      const dateA = new Date(a.pubDate || 0).getTime();
-      const dateB = new Date(b.pubDate || 0).getTime();
-      return dateB - dateA;
+      const d1 = new Date(a.pubDate || 0).getTime();
+      const d2 = new Date(b.pubDate || 0).getTime();
+      return d2 - d1;
     });
 
-    // We pass the data in a way that the renderer expects
-    // using 'as any' to allow our new flattened list
-    const output = render({ 
-      allPosts 
-    } as any);
-    
-    writeFileSync('./public/index.html', output);
-    console.log("Success! index.html written.");
+    // Render using the custom template variable 'allPosts'
+    // We cast to any to stop TypeScript from complaining about the custom variable
+    const output = render({ allPosts } as any);
 
-  } catch (error) {
-    console.error("Build Error:", error);
+    writeFileSync('./public/index.html', output);
+    console.log(`Build success: ${allPosts.length} posts generated.`);
+  } catch (err) {
+    console.error("Critical Build Error:", err);
     process.exit(1);
   }
-}
-
-run();
+})();
