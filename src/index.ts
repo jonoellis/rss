@@ -1,14 +1,13 @@
-import { build } from './bubo/index.js';
-import { render } from './renderer.js';
+import { build } from './bubo/index';
+import { render } from './renderer';
 import { writeFileSync } from 'fs';
 
 (async () => {
   try {
-    // 1. Fetch and process feeds
     const { groups } = await build();
     const allPosts: any[] = [];
 
-    // 2. Flatten the Categories/Groups into one list
+    // Flatten the nested structure
     for (const groupName in groups) {
       const feedsInGroup = groups[groupName];
       for (const feed of feedsInGroup) {
@@ -16,31 +15,28 @@ import { writeFileSync } from 'fs';
           for (const article of feed.articles) {
             allPosts.push({
               ...article,
-              groupName: groupName, // Category: Best, Alerts, etc.
-              feedTitle: feed.title // Blog name
+              groupName: groupName,
+              feedTitle: feed.title
             });
           }
         }
       }
     }
 
-    // 3. Sort: Newest posts first
+    // Sort: Newest posts at the top
     allPosts.sort((a, b) => {
       const dateA = new Date(a.pubDate || 0).getTime();
       const dateB = new Date(b.pubDate || 0).getTime();
       return dateB - dateA;
     });
 
-    // 4. Render the HTML 
-    // We pass 'allPosts' to your template. 'as any' prevents TS build errors.
+    // Render the flattened list
     const output = render({ allPosts } as any);
 
-    // 5. Write the final file
     writeFileSync('./public/index.html', output);
-    console.log(`Successfully processed ${allPosts.length} posts.`);
-
-  } catch (err) {
-    console.error("Build Runtime Error:", err);
+    console.log(`Successfully built ${allPosts.length} posts.`);
+  } catch (error) {
+    console.error("Build Runtime Error:", error);
     process.exit(1);
   }
 })();
