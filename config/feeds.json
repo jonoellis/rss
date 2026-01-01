@@ -1,7 +1,6 @@
 {
   "Best": [
 "https://feeds.kottke.org/main",
-"https://russelldavies.typepad.com/planning/atom.xml",
 "https://jeremymaluf.com/feed/",
 "https://eryksawicki.com/feed.rss",
 "https://undermanager.ghost.io/rss/",
@@ -14,9 +13,9 @@
 "https://mygrandidea.wordpress.com/feed/",
 "https://blogs.gov.scot/digital/feed/",
 "https://bagboilbeer.wordpress.com/feed/",
-"https://www.google.co.uk/alerts/feeds/05195731409910396142/6980829982595510224",
 "https://trinitycommunitycouncil.wordpress.com/feed/",
 "https://www.google.co.uk/alerts/feeds/05195731409910396142/5001252812172638784",
+"https://www.google.co.uk/alerts/feeds/05195731409910396142/15184398916993934671",
 "https://www.google.co.uk/alerts/feeds/05195731409910396142/5001252812172636217",
 "https://www.google.co.uk/alerts/feeds/05195731409910396142/13739151093108705371",
 "https://www.trinityparentcouncil.org.uk/feed/",
@@ -51,8 +50,8 @@
 "https://www.simoahava.com/index.xml",
 "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml",
 "https://feeds.feedburner.com/OfficialGmailBlog",
-"https://analytics.blogspot.com/feeds/posts/default",
-"https://webmasters.googleblog.com/feeds/posts/default",
+"https://blog.google/products/marketingplatform/analytics/rss/",
+"https://feeds.feedburner.com/blogspot/amDG",
 "https://officialandroid.blogspot.com/feeds/posts/default",
 "https://gdsdata.blog.gov.uk/feed/",
 "https://gds.blog.gov.uk/feed/"
