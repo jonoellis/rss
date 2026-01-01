@@ -3,52 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSS Reader</title>
+    <title>RSS Feed</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 1rem; background: #fff; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.4; color: #333; max-width: 1000px; margin: 0 auto; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
         tr { border-bottom: 1px solid #eee; }
-        tr:hover { background: #fdfdfd; }
-        td { padding: 8px 4px; vertical-align: top; }
+        tr:hover { background: #fafafa; }
+        td { padding: 6px 4px; vertical-align: top; font-size: 0.85rem; }
         .date { color: #888; white-space: nowrap; width: 90px; }
-        .category { color: #999; font-size: 0.7rem; text-transform: uppercase; width: 80px; font-weight: bold; }
-        .blog-name { color: #444; font-weight: 600; width: 160px; overflow: hidden; text-overflow: ellipsis; }
-        .title { font-weight: 400; }
+        .category { color: #999; font-size: 0.7rem; text-transform: uppercase; font-weight: bold; width: 80px; }
+        .blog { color: #555; font-weight: 600; width: 150px; }
+        .archive { font-size: 0.75rem; text-align: right; }
         a { color: #0066cc; text-decoration: none; }
         a:hover { text-decoration: underline; }
-        .archive { font-size: 0.75rem; opacity: 0.6; width: 60px; text-align: right; }
-        .footer { margin-top: 3rem; font-size: 0.75rem; color: #bbb; text-align: center; border-top: 1px solid #eee; padding-top: 1rem; }
     </style>
 </head>
 <body>
-
     <table>
         <tbody>
             <% for(const post of allPosts) { %>
             <tr>
-                <td class="date">
-                    <%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '????-??-??' %>
-                </td>
-                <td class="category">
-                    [<%= post.groupName %>]
-                </td>
-                <td class="blog-name">
-                    <%= post.feedTitle %>
-                </td>
-                <td class="title">
-                    <a href="<%= post.link %>" target="_blank" rel="noopener"><%= post.title %></a>
-                </td>
+                <td class="date"><%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '' %></td>
+                <td class="category">[<%= post.groupName %>]</td>
+                <td class="blog"><%= post.feedTitle || 'Unknown' %></td>
+                <td><a href="<%= post.link %>" target="_blank"><%= post.title %></a></td>
                 <td class="archive">
-                    <a href="https://archive.md/<%= post.link %>" target="_blank">archive</a>
+                    <a href="https://archive.md/<%= post.link %>" target="_blank" style="color: #999;">archive</a>
                 </td>
             </tr>
             <% } %>
         </tbody>
     </table>
-
-    <div class="footer">
-        Generated: <%= new Date().toLocaleString() %> | Built with Bubo-RSS
-    </div>
-
 </body>
 </html>
