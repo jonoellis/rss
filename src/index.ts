@@ -1,13 +1,14 @@
-import { build } from './bubo/index';
+// 1. Using the project's official alias to fix Netlify resolution
+import { build } from '@bubo'; 
 import { render } from './renderer';
 import { writeFileSync } from 'fs';
 
 (async () => {
-  // The 'build' function returns feeds and groups
+  // We use the build function to get all feeds across all groups
   const { groups } = await build();
   const allPosts: any[] = [];
 
-  // 1. Flatten the groups/feeds structure into a single array
+  // 2. Flatten the nested structure: Group -> Feed -> Articles
   for (const groupName in groups) {
     const feedsInGroup = groups[groupName];
     
@@ -16,20 +17,23 @@ import { writeFileSync } from 'fs';
         for (const article of feed.articles) {
           allPosts.push({
             ...article,
-            groupName: groupName, // e.g., "Best"
-            feedTitle: feed.title // e.g., "Kottke"
+            groupName: groupName, // e.g. "Best", "Alerts"
+            feedTitle: feed.title // e.g. "Kottke"
           });
         }
       }
     }
   }
 
-  // 2. Sort by date descending
+  // 3. Sort everything chronologically (Newest at the top)
   allPosts.sort((a, b) => {
-    return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
+    const dateA = new Date(a.pubDate || 0).getTime();
+    const dateB = new Date(b.pubDate || 0).getTime();
+    return dateB - dateA;
   });
 
-  // 3. Render and cast to 'any' to bypass strict type check for the custom template
+  // 4. Render the template using the flattened list
+  // 'as any' is required to bypass the library's internal type check
   const output = render({ 
     allPosts 
   } as any);
