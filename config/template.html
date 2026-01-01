@@ -5,28 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSS Reader</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        body { font-family: -apple-system, sans-serif; color: #333; max-width: 1100px; margin: 0 auto; padding: 20px; }
         table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .date { color: #888; width: 100px; }
-        .cat { color: #999; font-size: 11px; text-transform: uppercase; width: 80px; }
-        .blog { font-weight: bold; width: 150px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .date { color: #888; width: 110px; }
+        .cat { color: #999; font-size: 11px; text-transform: uppercase; font-weight: bold; width: 90px; }
+        .blog { font-weight: 600; width: 180px; }
         a { color: #0066cc; text-decoration: none; }
     </style>
 </head>
 <body>
     <table>
-        <% if (locals.allPosts) { %>
-            <% for(const post of allPosts) { %>
+        <tbody>
+            {# Flattening the groups back into one list #}
+            {% set allPosts = [] %}
+            {% for groupName, posts in data %}
+                {% for post in posts %}
+                    {% set _ = post.update({'groupName': groupName}) %}
+                    {% set _ = allPosts.push(post) %}
+                {% endfor %}
+            {% endfor %}
+
+            {# Sort the flattened list by date #}
+            {% for post in allPosts | sort(true, false, 'pubDate') %}
             <tr>
-                <td class="date"><%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '' %></td>
-                <td class="cat">[<%= post.groupName %>]</td>
-                <td class="blog"><%= post.feedTitle %></td>
-                <td><a href="<%= post.link %>" target="_blank"><%= post.title %></a></td>
-                <td><a href="https://archive.md/<%= post.link %>" target="_blank" style="color:#ccc; font-size:12px;">archive</a></td>
+                <td class="date">{{ post.pubDate | formatDate if post.pubDate else "" }}</td>
+                <td class="cat">[{{ post.groupName }}]</td>
+                <td class="blog">{{ post.feedTitle }}</td>
+                <td><a href="{{ post.link }}" target="_blank">{{ post.title }}</a></td>
+                <td><a href="https://archive.md/{{ post.link }}" target="_blank" style="color:#ccc; font-size:11px;">archive</a></td>
             </tr>
-            <% } %>
-        <% } %>
+            {% endfor %}
+        </tbody>
     </table>
 </body>
 </html>
