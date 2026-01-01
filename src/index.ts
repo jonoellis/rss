@@ -2,12 +2,15 @@ import { build } from './bubo/index';
 import { render } from './renderer';
 import { writeFileSync } from 'fs';
 
-(async () => {
+async function run() {
+  console.log("Starting build process...");
+  
   try {
     const { groups } = await build();
+    console.log("Feeds fetched successfully.");
+
     const allPosts: any[] = [];
 
-    // Flatten the nested structure
     for (const groupName in groups) {
       const feedsInGroup = groups[groupName];
       for (const feed of feedsInGroup) {
@@ -23,20 +26,24 @@ import { writeFileSync } from 'fs';
       }
     }
 
-    // Sort: Newest posts at the top
+    console.log(`Flattened ${allPosts.length} posts. Sorting now...`);
+
     allPosts.sort((a, b) => {
       const dateA = new Date(a.pubDate || 0).getTime();
       const dateB = new Date(b.pubDate || 0).getTime();
       return dateB - dateA;
     });
 
-    // Render the flattened list
     const output = render({ allPosts } as any);
-
+    
     writeFileSync('./public/index.html', output);
-    console.log(`Successfully built ${allPosts.length} posts.`);
+    console.log("Build complete! index.html written to /public.");
+
   } catch (error) {
-    console.error("Build Runtime Error:", error);
+    console.error("FATAL ERROR during build:");
+    console.error(error);
     process.exit(1);
   }
-})();
+}
+
+run();
