@@ -1,0 +1,14 @@
+name: Hourly Trigger
+on:
+  schedule:
+    # 5am to 10pm UK time is 5 to 22 UTC. 
+    # This runs at the start of every hour.
+    - cron: '0 5-22 * * *'
+  workflow_dispatch: # Allows you to run it manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify Build
+        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK }}
