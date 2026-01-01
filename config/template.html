@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSS Reader</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 1rem; }
+        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #333; max-width: 1200px; margin: 0 auto; padding: 1rem; background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         tr { border-bottom: 1px solid #eee; }
         tr:hover { background: #fdfdfd; }
-        td { padding: 6px 4px; vertical-align: top; }
+        td { padding: 8px 4px; vertical-align: top; }
         .date { color: #888; white-space: nowrap; width: 90px; }
-        .category { color: #999; font-size: 0.7rem; text-transform: uppercase; width: 80px; }
-        .blog-name { color: #555; font-weight: 600; width: 150px; }
+        .category { color: #999; font-size: 0.7rem; text-transform: uppercase; width: 80px; font-weight: bold; }
+        .blog-name { color: #444; font-weight: 600; width: 160px; overflow: hidden; text-overflow: ellipsis; }
         .title { font-weight: 400; }
         a { color: #0066cc; text-decoration: none; }
         a:hover { text-decoration: underline; }
-        .archive { font-size: 0.75rem; opacity: 0.6; }
-        .footer { margin-top: 2rem; font-size: 0.7rem; color: #bbb; text-align: center; }
+        .archive { font-size: 0.75rem; opacity: 0.6; width: 60px; text-align: right; }
+        .footer { margin-top: 3rem; font-size: 0.75rem; color: #bbb; text-align: center; border-top: 1px solid #eee; padding-top: 1rem; }
     </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
             <% for(const post of allPosts) { %>
             <tr>
                 <td class="date">
-                    <%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : 'n/a' %>
+                    <%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '????-??-??' %>
                 </td>
                 <td class="category">
                     [<%= post.groupName %>]
@@ -47,7 +47,7 @@
     </table>
 
     <div class="footer">
-        Updated: <%= new Date().toISOString() %>
+        Generated: <%= new Date().toLocaleString() %> | Built with Bubo-RSS
     </div>
 
 </body>
