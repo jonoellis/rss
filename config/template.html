@@ -3,35 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSS Feed</title>
+    <title>RSS Reader</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #333; max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
-        table { width: 100%; border-collapse: collapse; }
-        tr { border-bottom: 1px solid #eee; }
-        tr:hover { background: #f9f9f9; }
-        td { padding: 10px 5px; vertical-align: top; font-size: 0.9rem; }
-        .date { color: #888; width: 100px; white-space: nowrap; }
-        .cat { color: #999; font-size: 0.7rem; text-transform: uppercase; font-weight: bold; width: 80px; }
-        .blog { font-weight: 600; width: 160px; color: #555; }
-        a { color: #0066cc; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .archive { text-align: right; width: 60px; }
-        .archive a { color: #bbb; font-size: 0.75rem; }
+        body { font-family: -apple-system, sans-serif; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background: #fdfdfd; }
+        table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #eee; }
+        td { padding: 12px 8px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
+        tr:hover { background-color: #f9f9fb; }
+        .date { color: #888; width: 100px; font-variant-numeric: tabular-nums; }
+        .category { color: #999; font-size: 11px; text-transform: uppercase; font-weight: bold; width: 80px; }
+        .blog { font-weight: 600; width: 180px; color: #444; }
+        .title { color: #0066cc; text-decoration: none; }
+        .title:hover { text-decoration: underline; }
+        .archive { text-align: right; width: 80px; }
+        .archive a { color: #ccc; font-size: 12px; text-decoration: none; }
+        .archive a:hover { color: #999; }
     </style>
 </head>
 <body>
     <table>
         <tbody>
-            <% if (typeof allPosts !== 'undefined' && allPosts.length > 0) { %>
+            <% if (locals.allPosts) { %>
                 <% for(const post of allPosts) { %>
                 <tr>
-                    <td class="date"><%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '' %></td>
-                    <td class="cat">[<%= post.groupName %>]</td>
+                    <td class="date"><%= post.pubDate ? new Date(post.pubDate).toISOString().split('T')[0] : '????-??-??' %></td>
+                    <td class="category">[<%= post.groupName %>]</td>
                     <td class="blog"><%= post.feedTitle %></td>
-                    <td><a href="<%= post.link %>" target="_blank"><%= post.title %></a></td>
-                    <td class="archive">
-                        <a href="https://archive.md/<%= post.link %>" target="_blank">archive</a>
-                    </td>
+                    <td><a href="<%= post.link %>" class="title" target="_blank"><%= post.title %></a></td>
+                    <td class="archive"><a href="https://archive.md/<%= post.link %>" target="_blank">archive.md</a></td>
                 </tr>
                 <% } %>
             <% } %>
