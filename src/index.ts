@@ -25,13 +25,14 @@ const stubbornParser = new Parser({
 
     for (const groupName in feedsData) {
       for (const url of feedsData[groupName]) {
-        let feed;
+        let feed: any; // Explicitly typed as 'any' to fix TS7034/TS7005
+        
         try {
-          // Attempt 1: Standard
+          // Attempt 1: Standard fetch for Google/Blogspot/Swiss-Miss
           feed = await standardParser.parseURL(url.trim());
         } catch (e) {
           try {
-            // Attempt 2: Stubborn/Loose SSL
+            // Attempt 2: Loose SSL for Stross/Maluf
             console.log(`⚠️ Retrying with loose settings: ${url}`);
             feed = await stubbornParser.parseURL(url.trim());
           } catch (retryError: any) {
@@ -43,7 +44,8 @@ const stubbornParser = new Parser({
         if (feed && feed.items) {
           feed.items.forEach((item: any) => {
             allPosts.push({
-              title: item.title, link: item.link,
+              title: item.title, 
+              link: item.link,
               pubDate: item.pubDate || item.isoDate,
               feedTitle: feed.title
             });
@@ -55,6 +57,7 @@ const stubbornParser = new Parser({
     allPosts.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
     const output = env.renderString(template, { allPosts, errorFeeds, now: new Date().toUTCString() });
     writeFileSync('./public/index.html', output);
+    console.log("✅ Build Successful");
   } catch (error) {
     console.error("🔥 Critical Failure:", error);
     process.exit(1);
