@@ -18,28 +18,31 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      table-layout: fixed; /* Allows cells to shrink properly */
-      word-wrap: break-word;
+      table-layout: fixed; /* Cells share available width */
     }
 
     td {
       padding: 10px 0;
       border-bottom: 1px solid #f0f0f0;
       vertical-align: top;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .blog-name {
+      width: 30%;
       font-weight: 600;
       color: #666;
       font-size: 0.85rem;
       padding-right: 10px;
-      width: 30%; /* Allow flex sizing on small screens */
     }
 
     .post-title {
       color: #0066cc;
       text-decoration: none;
       font-size: 0.95rem;
+      display: inline-block;
+      word-break: break-word;
     }
 
     .post-title:hover {
@@ -74,14 +77,10 @@
       margin: 0;
     }
 
-    /* Make table stack vertically on small screens */
+    /* Optional: adjust proportions on smaller screens */
     @media (max-width: 600px) {
-      table, tbody, tr, td {
-        display: block;
-        width: 100%;
-      }
       .blog-name {
-        margin-bottom: 4px;
+        width: 35%;
       }
     }
   </style>
