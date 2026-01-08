@@ -14,8 +14,28 @@ const stubbornParser = new Parser({
   timeout: 15000,
 });
 
+/**
+ * Clean common HTML entities found in RSS titles (like kottke.org)
+ * without adding new npm dependencies.
+ */
+function cleanTitle(str: string | undefined): string {
+  if (!str) return 'Untitled';
+  return str
+    .replace(/&#8220;/g, '“')  // Left Double Quote
+    .replace(/&#8221;/g, '”')  // Right Double Quote
+    .replace(/&#8216;/g, '‘')  // Left Single Quote
+    .replace(/&#8217;/g, '’')  // Right Single Quote / Apostrophe
+    .replace(/&#8211;/g, '–')  // En Dash
+    .replace(/&#8212;/g, '—')  // Em Dash
+    .replace(/&#8230;/g, '...') // Ellipsis
+    .replace(/&amp;/g, '&')    // Ampersand
+    .replace(/&quot;/g, '"')   // Quote
+    .replace(/&lt;/g, '<')     // Less than
+    .replace(/&gt;/g, '>');    // Greater than
+}
+
 (async () => {
-  console.log("🚀 Running Smart-Retry Build...");
+  console.log("🚀 Running Smart-Retry Build with Title Cleaning...");
   try {
     const env = nunjucks.configure({ autoescape: true });
     const feedsData = JSON.parse(readFileSync('./config/feeds.json', 'utf-8'));
@@ -25,14 +45,12 @@ const stubbornParser = new Parser({
 
     for (const groupName in feedsData) {
       for (const url of feedsData[groupName]) {
-        let feed: any; // Explicitly typed as 'any' to fix TS7034/TS7005
+        let feed: any;
         
         try {
-          // Attempt 1: Standard fetch for Google/Blogspot/Swiss-Miss
           feed = await standardParser.parseURL(url.trim());
         } catch (e) {
           try {
-            // Attempt 2: Loose SSL for Stross/Maluf
             console.log(`⚠️ Retrying with loose settings: ${url}`);
             feed = await stubbornParser.parseURL(url.trim());
           } catch (retryError: any) {
@@ -44,7 +62,8 @@ const stubbornParser = new Parser({
         if (feed && feed.items) {
           feed.items.forEach((item: any) => {
             allPosts.push({
-              title: item.title, 
+              // Apply the cleaning function here
+              title: cleanTitle(item.title), 
               link: item.link,
               pubDate: item.pubDate || item.isoDate,
               feedTitle: feed.title
