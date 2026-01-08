@@ -1,48 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading List</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px 20px; background: #fff; color: #333; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 10px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
-        .blog-name { width: 200px; font-weight: 600; color: #666; font-size: 0.85rem; padding-right: 20px; }
-        .post-title { color: #0066cc; text-decoration: none; font-size: 0.95rem; }
-        .post-title:hover { text-decoration: underline; }
-        
-        .footer { margin-top: 80px; padding-top: 20px; border-top: 1px dashed #eee; font-size: 0.7rem; color: #bbb; }
-        .error-log { margin-top: 20px; color: #e06c75; background: #fff5f5; padding: 10px; border-radius: 4px; }
-        .error-log h3 { font-size: 0.75rem; margin-top: 0; text-transform: uppercase; }
-        .error-log ul { list-style: none; padding: 0; margin: 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading List</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #fff;
+      color: #333;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed; /* Allows cells to shrink properly */
+      word-wrap: break-word;
+    }
+
+    td {
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: top;
+    }
+
+    .blog-name {
+      font-weight: 600;
+      color: #666;
+      font-size: 0.85rem;
+      padding-right: 10px;
+      width: 30%; /* Allow flex sizing on small screens */
+    }
+
+    .post-title {
+      color: #0066cc;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .post-title:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 80px;
+      padding-top: 20px;
+      border-top: 1px dashed #eee;
+      font-size: 0.7rem;
+      color: #bbb;
+    }
+
+    .error-log {
+      margin-top: 20px;
+      color: #e06c75;
+      background: #fff5f5;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .error-log h3 {
+      font-size: 0.75rem;
+      margin-top: 0;
+      text-transform: uppercase;
+    }
+
+    .error-log ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Make table stack vertically on small screens */
+    @media (max-width: 600px) {
+      table, tbody, tr, td {
+        display: block;
+        width: 100%;
+      }
+      .blog-name {
+        margin-bottom: 4px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <table>
-        <tbody>
-            {% for post in allPosts %}
-            <tr>
-                <td class="blog-name">{{ post.feedTitle }}</td>
-                <td><a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table>
+    <tbody>
+      {% for post in allPosts %}
+      <tr>
+        <td class="blog-name">{{ post.feedTitle }}</td>
+        <td><a href="{{ post.link }}" class="post-title" target="_blank">{{ post.title }}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-    <div class="footer">
-        <p>Last update: {{ now }}</p>
-        
-        {% if errorFeeds.length > 0 %}
-        <div class="error-log">
-            <h3>Feed Errors ({{ errorFeeds.length }})</h3>
-            <ul>
-                {% for url in errorFeeds %}
-                <li>Broken: {{ url }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+  <div class="footer">
+    <p>Last update: {{ now }}</p>
+
+    {% if errorFeeds.length > 0 %}
+    <div class="error-log">
+      <h3>Feed Errors ({{ errorFeeds.length }})</h3>
+      <ul>
+        {% for url in errorFeeds %}
+        <li>Broken: {{ url }}</li>
+        {% endfor %}
+      </ul>
     </div>
+    {% endif %}
+  </div>
 </body>
 </html>
