@@ -46,8 +46,8 @@
 "https://www.wowhaus.co.uk/feed/"  
       ],
   "Comics": ["https://syndicated.livejournal.com/xkcd_rss/data/rss"],
-    "Industry": [
-      "https://blog.google/rss/",
+  "Industry": [
+"https://blog.google/rss/",
 "https://www.simoahava.com/index.xml",
 "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml",
 "https://feeds.feedburner.com/OfficialGmailBlog",
@@ -55,6 +55,7 @@
 "https://feeds.feedburner.com/blogspot/amDG",
 "https://officialandroid.blogspot.com/feeds/posts/default",
 "https://gdsdata.blog.gov.uk/feed/",
-"https://gds.blog.gov.uk/feed/"
+"https://gds.blog.gov.uk/feed/",
+"https://alphagov.github.io/govuk-ai/feed.xml"
     ]
 }
