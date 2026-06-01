@@ -44,7 +44,9 @@
 "https://feeds.acast.com/public/shows/41233",
 "https://craphound.com/?feed=rss2",
 "https://www.wowhaus.co.uk/feed/",
-"https://unsung.aresluna.org/feed.xml"
+"https://unsung.aresluna.org/feed.xml",
+    "https://www.spokes.org.uk/feed/",
+    "https://powderhalllink.wordpress.com/feed/"
       ],
   "Comics": ["https://syndicated.livejournal.com/xkcd_rss/data/rss"],
   "Industry": [
