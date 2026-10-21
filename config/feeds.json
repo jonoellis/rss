@@ -45,8 +45,10 @@
 "https://craphound.com/?feed=rss2",
 "https://www.wowhaus.co.uk/feed/",
 "https://unsung.aresluna.org/feed.xml",
-    "https://www.spokes.org.uk/feed/",
-    "https://powderhalllink.wordpress.com/feed/"
+"https://www.spokes.org.uk/feed/",
+"https://powderhalllink.wordpress.com/feed/",
+"https://100r.ca/links/rss.xml",
+"https://mwhile.com/feed.rss"
       ],
   "Comics": ["https://syndicated.livejournal.com/xkcd_rss/data/rss"],
   "Industry": [
